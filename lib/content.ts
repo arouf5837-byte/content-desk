@@ -1,15 +1,16 @@
 export type Row = {id:string;[key:string]:any};
 export type Data = Record<string,Row[]>;
-export const tables=['businesses','destinations','contents','content_variants','assets','posts','post_metrics'];
+export const tables=['businesses','destinations','contents','content_variants','assets','posts','post_metrics','products'];
 export const emptyData:Data=Object.fromEntries(tables.map(t=>[t,[]]));
 export const platforms:Record<string,string>={facebook:'Facebook',instagram:'Instagram',tiktok:'TikTok',linkedin:'LinkedIn',x:'X / Twitter'};
 export const contentStates:Record<string,string>={idea:'আইডিয়া',draft:'খসড়া',review:'রিভিউ',ready:'প্রস্তুত',archived:'আর্কাইভ'};
 export const postStates:Record<string,string>={planned:'পরিকল্পিত',scheduled:'নির্ধারিত',pending_approval:'অনুমোদনের অপেক্ষায়',published:'প্রকাশিত',failed:'ব্যর্থ',rejected:'প্রত্যাখ্যাত',cancelled:'বাতিল'};
 export const formats:Record<string,string>={text:'লেখা',image:'ছবি',carousel:'ক্যারোসেল',video:'ভিডিও'};
+export const intents:Record<string,string>={awareness:'পরিচিতি বাড়ানো',education:'বোঝানো / শেখানো',trust:'বিশ্বাস তৈরি',leads:'ইনকোয়ারি / লিড',sales:'বিক্রি',engagement:'আলোচনা / এনগেজমেন্ট',retention:'পুরোনো ক্রেতা ধরে রাখা'};
 export const sources:Record<string,string>={manual:'নিজে তৈরি',ai:'AI দিয়ে',mixed:'AI + নিজে'};
 export const metricLabels:Record<string,string>={reach:'রিচ',impressions:'ইমপ্রেশন',views:'ভিউ',likes:'লাইক',comments:'কমেন্ট',shares:'শেয়ার',saves:'সেভ',clicks:'ক্লিক',inquiries:'ইনকোয়ারি',qualified_leads:'যোগ্য লিড',booked_calls:'বুক করা কল',orders:'অর্ডার',revenue:'বিক্রির পরিমাণ',spend:'খরচ'};
-export type Filters={business:string;q:string;platform:string;status:string;format:string;source:string;destination:string;from:string;to:string;distribution:string};
-export const defaults:Filters={business:'all',q:'',platform:'all',status:'all',format:'all',source:'all',destination:'all',from:'',to:'',distribution:'all'};
+export type Filters={business:string;product:string;q:string;platform:string;status:string;format:string;source:string;destination:string;from:string;to:string;distribution:string};
+export const defaults:Filters={business:'all',product:'all',q:'',platform:'all',status:'all',format:'all',source:'all',destination:'all',from:'',to:'',distribution:'all'};
 export function localDate(iso?:string|null){if(!iso)return '';return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Dhaka',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(iso))}
 export function localInput(iso?:string|null){if(!iso)return '';const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Dhaka',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(iso));const v=(k:string)=>p.find(x=>x.type===k)?.value;return v('year')+'-'+v('month')+'-'+v('day')+'T'+v('hour')+':'+v('minute')}
 export function fromInput(value:string){return value?new Date(value+':00+06:00').toISOString():null}
@@ -18,9 +19,10 @@ export function number(value:unknown){return value==null?'—':Number(value).toL
 export function postDate(p:Row){return p.published_at||p.scheduled_at||p.submitted_at||p.created_at}
 export function latestMetrics(rows:Row[],asOf?:string){const map=new Map<string,Row>();for(const r of rows){if(asOf&&localDate(r.measured_at)>asOf)continue;const old=map.get(r.post_id);if(!old||new Date(r.measured_at).getTime()>new Date(old.measured_at).getTime())map.set(r.post_id,r)}return map}
 export function filtered(data:Data,f:Filters,mode:string){
- const business=(r:Row)=>f.business==='all'||r.business_id===f.business;
+ const activeBusinesses=new Set(data.businesses.filter(b=>!b.archived_at).map(b=>b.id));
+ const business=(r:Row)=>activeBusinesses.has(r.business_id)&&(f.business==='all'||r.business_id===f.business);
  const period=(value:string)=>{const d=localDate(value);return(!f.from||d>=f.from)&&(!f.to||d<=f.to)};
- const contentMatch=(c:Row)=>business(c)&&(f.format==='all'||c.format===f.format)&&(f.source==='all'||c.source===f.source)&&(!f.q||[c.title,c.topic,c.offer_name,c.brief,c.script,...(c.tags||[])].filter(Boolean).join(' ').toLowerCase().includes(f.q.toLowerCase()));
+ const contentMatch=(c:Row)=>business(c)&&(f.product==='all'||(f.product==='none'?!c.product_id:c.product_id===f.product))&&(f.format==='all'||c.format===f.format)&&(f.source==='all'||c.source===f.source)&&(!f.q||[c.title,c.topic,c.offer_name,c.brief,c.script,...(c.tags||[])].filter(Boolean).join(' ').toLowerCase().includes(f.q.toLowerCase()));
  const candidates=data.contents.filter(contentMatch);
  const ids=new Set(candidates.map(c=>c.id));
  const variants=new Map(data.content_variants.map(v=>[v.id,v]));
