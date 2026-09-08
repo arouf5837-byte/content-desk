@@ -31,3 +31,6 @@ Owner policies scope data through businesses.owner_id = auth.uid(). Do not grant
 
 ## Files and maintenance
 app/editor.tsx handles forms; app/catalog.tsx business/products; app/content-media.tsx previews; lib/media.ts uploads; lib/content.ts filters and shared labels. Keep schema and payload names aligned. SQL 01 base, 05 Vault, 06 products/business archive, 07 content fields and group links; 08/09 are historical repair attempts, not verified required migrations. Prefer querying live catalog before further DDL. Preserve data and existing uniqueness; no repeated blind constraint creation.
+
+## Direct forms update
+Group Link/CSV dialog now always shows Business then Product/Service dropdown, default business-only. One selected product applies to all pasted links or CSV rows. Supports multiline link paste as well as CSV upload. Destination editor also permits optional group product assignment (additive; existing links remain). New/existing social account forms show platform-specific credential inputs directly, saved via existing Vault RPC after destination save. The destination ID is retained after partial failure to avoid duplicate account creation on retry. Blank credential inputs preserve stored values; platform changes clear unsaved token inputs.
