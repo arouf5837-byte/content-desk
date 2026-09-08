@@ -3,6 +3,9 @@
 ## Read before editing
 Personal Bangla content workspace for multiple ecommerce and agency businesses. Preserve a simple email/password login, business isolation, optional product assignments, private media and encrypted credentials. Update this file whenever behavior or schema changes.
 
+## Repository portability
+The database/ directory contains versioned schema and feature SQL plus diagnostic queries. Read database/README.md before running scripts; do not treat them as an automatic migration sequence on an existing deployment. Local .env, generated builds and temporary work are Git-ignored. Supabase publishable configuration in client code is public by design; private API credentials are stored through Vault RPCs.
+
 ## Stack and deployment
 React, TypeScript, Vinext/Vite, Supabase JS client, Shadcn components. `app/page.tsx` handles Supabase email/password login; `app/workspace.tsx` loads data and renders navigation, content, posts, calendar, analytics and settings. `lib/supabase.ts` initializes the client using public project configuration. Local `.env` contains user-provided URL and public keys, ignored by Git. These keys are not administrative credentials. No service-role key belongs in client code.
 
