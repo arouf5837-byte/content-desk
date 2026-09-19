@@ -1,0 +1,3 @@
+name,url,products,platform,visibility,audience_notes,posting_rules,approval_required
+Facebook গ্রুপ,https://www.facebook.com/groups/REPLACE_WITH_GROUP_ID/,,facebook,public,টার্গেট অডিয়েন্স,গ্রুপের নিয়ম,true
+LinkedIn গ্রুপ,https://www.linkedin.com/groups/REPLACE_WITH_NUMERIC_ID/,,linkedin,private,টার্গেট অডিয়েন্স,গ্রুপের নিয়ম,false

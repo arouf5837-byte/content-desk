@@ -1,0 +1,2 @@
+# Required before any edit or update
+Read ARCHITECTURE.md completely before editing code, configuration, SQL, or publishing this project. Use it to understand the system and its verification limits. After making changes, update ARCHITECTURE.md to describe the resulting behavior and material limitations. Never expose .env or automation secrets; never infer live database migration status solely from local SQL files.
