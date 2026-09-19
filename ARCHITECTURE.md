@@ -72,6 +72,8 @@ erDiagram
    - Detail sheet with tabs: Content, Lead Funnel, Versions, Files, Post History.
 3. **Post Tracker (`posts`)**:
    - Multi-platform post scheduling and publication tracking.
+   - Bulk selection, bulk delete, and single delete with cascade cleanup of associated `post_metrics` snapshots.
+   - Quick recency scope filters: 'আজকের পোস্ট' (Today in Dhaka time with glowing badge), 'নতুন ও সাম্প্রতিক (৭ দিন)' (last 7 days), and 'সব পোস্ট' (all posts), ensuring today's and new posts are immediately accessible without manual date pickers.
    - 1-click shortcut to add a lead directly from a published post.
 4. **Lead Magnets (`lead_magnets`)**:
    - Free assets, trigger keywords, resource URLs, and funnel stages.
