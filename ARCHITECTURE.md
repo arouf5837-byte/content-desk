@@ -107,3 +107,13 @@ Vault-backed secure storage via `05-social-credentials.sql`. RPCs `list_social_c
 | `database/07-group-products-content-fields.sql` | `destination_products` and enriched content fields | Applied |
 | `database/11-group-platform-visibility.sql` | Group platform visibility and LinkedIn group support | Applied |
 | `database/12-lead-magnets-audience-crm.sql` | Adds `lead_magnets`, `audience_leads`, `lead_interactions`, content CTA fields, and comment metrics | Applied |
+
+---
+
+## 6. Build & Deployment Architecture
+
+- **Engine & Build Script**: The project uses `vinext` on Vite. Static production distribution is handled by `scripts/build.mjs` (invoked via `npm run build`), which executes `vinext build --prerender-all`.
+- **Static Artifact Aggregation**: Static pre-rendered route files (`dist/server/prerendered-routes/index.html` and `404.html`) and client JS/CSS bundles (`dist/client/*`) are mapped directly into root `dist/`.
+- **Vercel Hosting**: Configured via `vercel.json` with output directory `dist` and single-page application (SPA) rewrites to `/index.html`.
+- **Verification & Runtime Limits**: All core views, authentication, and database operations run client-side against Supabase. Server-side API endpoints on Vercel without a Node/Edge adapter are not supported in this static distribution mode.
+
