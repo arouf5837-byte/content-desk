@@ -1,50 +1,132 @@
-# Content Desk architecture
+# Content Desk & Audience CRM Architecture
 
-## Read before editing
-Personal Bangla content workspace for multiple ecommerce and agency businesses. Preserve a simple email/password login, business isolation, optional product assignments, private media and encrypted credentials. Update this file whenever behavior or schema changes.
+## 1. System Overview
 
-## Repository portability
-The database/ directory contains versioned schema and feature SQL plus diagnostic queries. Read database/README.md before running scripts; do not treat them as an automatic migration sequence on an existing deployment. Local .env, generated builds and temporary work are Git-ignored. Supabase publishable configuration in client code is public by design; private API credentials are stored through Vault RPCs.
+**Content Desk** is an integrated Personal Brand, Content Production, Product Catalog, Lead Magnet Delivery, and Lightweight CRM system built for creators and agency founders focusing on AI automation, AI agents, n8n, GoHighLevel (GHL), voice AI, and business automation workflows.
 
-## Stack and deployment
-React, TypeScript, Vinext/Vite, Supabase JS client, Shadcn components. `app/page.tsx` handles Supabase email/password login; `app/workspace.tsx` loads data and renders navigation, content, posts, calendar, analytics and settings. `lib/supabase.ts` initializes the client using public project configuration. Local `.env` contains user-provided URL and public keys, ignored by Git. These keys are not administrative credentials. No service-role key belongs in client code.
+The system powers a **comment-driven inbound growth engine** across 5 primary social channels:
+- LinkedIn
+- Instagram
+- X / Twitter
+- Facebook Profile / Pages
+- Facebook Groups
 
-Project identity is in `.openai/hosting.json`. Live site: https://content-desk-hub.lofty-lily-0982.chatgpt.site/ . Build with npm run build. Publish the exact committed, pushed and built source using Sites hosting. Never archive .env or source credentials. SQL delivery files are in ../outputs; local SQL files do not prove that migrations ran on Supabase.
+Audiences interact with posts by commenting dedicated keywords (e.g. `IDEAS`, `GHL`, `BLUEPRINT`, `AGENT`, `AUDIT`, `DEMO`), triggering manual or semi-automated DM fulfillment, lead capture, qualification (potential client identification), and pipeline follow-up.
 
-## Data model
-- businesses: owner_id references the signed-in owner; kind ecommerce/agency; archived_at hides archived businesses.
-- products: business_id, product/service kind, name, description, archived_at. Composite unique (id,business_id) supports ownership-consistent foreign keys.
-- destinations: business_id, name, platform, destination_type (page/profile/group), URL, audience notes, posting rules, approval flag and active status. Every group belongs to a business.
-- destination_products: OPTIONAL many-to-many links between destinations and products. Composite primary key (destination_id,product_id), business_id and created_at. NO id column. Load ordered by destination_id and product_id. Both foreign keys include business_id to prevent cross-business assignment. No link means business-only; multiple links are allowed.
-- contents: business_id, optional product_id, title, copy/script, format, intent/objective, status, source, tags and optional brief, topic, content_pillar, target_audience, hook, cta, ai_notes.
-- content_variants: platform-specific content body, hashtags, CTA and label.
-- assets: content_id, business_id, bucket/storage_path, media type, filename, MIME and size. content-media bucket uses private storage; signed URLs expose individual files temporarily.
-- posts: variant and destination, planning/submission/publication timestamps, status, final copy, media_paths, URL and distribution.
-- post_metrics: timestamped cumulative snapshots; analytics uses the latest snapshot per post, not the sum of snapshots.
+---
 
-## Group CSV flow
-app/groups.tsx is the UI; lib/group-csv.ts parses UTF-8 CSV (also semicolon/tab separated), optional headers or one link per line, normalizes Facebook group URLs and rejects invalid rows. Max 2 MB / 2000 rows. Select business first, then assignment mode: business-only (ignore CSV products) or business+products. In product mode, optional selected product checkboxes apply to every row and CSV products names separated by | add row-specific assignments. Product names must match the selected business. Existing assignments are preserved on import; use the group's assignment editor to remove links. Existing group URLs are skipped for creation but can receive additional assignments. Same URL in a different business is allowed. Fetch fresh IDs before import and write batches of 200. Import currently consists of multiple requests: interruption may leave partial success; retry skips existing groups and upserts links.
+## 2. Core Entities & Data Architecture
 
-## Credentials and automation
-app/credentials.tsx and lib/credentials.ts provide per-destination Token controls in account settings and the existing-account editor. Save an account before adding credentials. Supports access/refresh/page tokens, API and client/app keys/secrets, account/page/business/ad IDs, webhook secret and custom fields, expiry and scopes. Values are password-masked and never read back into the client.
-05-social-credentials.sql creates content_hub_private.social_credentials metadata and stores values in Supabase Vault. RPCs list_social_credentials (metadata only), save_social_credential and remove_social_credential check ownership. read_social_credentials_for_automation is service-role only; future server-side automation supplies destination and owner IDs. 06 SQL restricts automation to active accounts/non-archived businesses. Storage is implemented; OAuth authorization, refresh scheduling, API validation and auto-posting are NOT implemented. Storing a token does not guarantee a platform supports posting to that destination.
+```mermaid
+erDiagram
+    businesses ||--o{ products : "offers"
+    businesses ||--o{ destinations : "owns"
+    businesses ||--o{ contents : "creates"
+    businesses ||--o{ lead_magnets : "publishes"
+    businesses ||--o{ audience_leads : "tracks"
+    businesses ||--o{ lead_interactions : "logs"
+    destinations ||--o{ destination_products : "links"
+    products ||--o{ destination_products : "assigned_to"
 
-## Access and verification
-Owner policies scope data through businesses.owner_id = auth.uid(). Do not grant anonymous access to make diagnostics succeed. On the 2026-09-08 direct REST check, destination_products returned HTTP 401 / PostgreSQL 42501 permission denied for anon. That confirms API connectivity and permission enforcement, not authenticated CRUD success or all constraints. The current session has no authenticated user token or management credential. Supabase dashboard was logged out. Never claim the live schema/SQL is fully verified from local files or prior error messages.
+    contents ||--o{ content_variants : "has"
+    contents ||--o| products : "promotes (product_id)"
+    contents ||--o| lead_magnets : "promotes (lead_magnet_id)"
+    content_variants ||--o{ posts : "scheduled_to"
+    destinations ||--o{ posts : "published_on"
+    posts ||--o{ post_metrics : "measured_by"
+    posts ||--o{ audience_leads : "generates (source_post_id)"
 
-## Files and maintenance
-app/editor.tsx handles forms; app/catalog.tsx business/products; app/content-media.tsx previews; lib/media.ts uploads; lib/content.ts filters and shared labels. Keep schema and payload names aligned. SQL 01 base, 05 Vault, 06 products/business archive, 07 content fields and group links; 08/09 are historical repair attempts, not verified required migrations. Prefer querying live catalog before further DDL. Preserve data and existing uniqueness; no repeated blind constraint creation.
+    audience_leads ||--o{ lead_interactions : "has"
+    lead_magnets ||--o{ audience_leads : "attracts"
+    lead_magnets ||--o{ lead_interactions : "delivered_in"
+```
 
-## Direct forms update
-Group Link/CSV dialog now always shows Business then Product/Service dropdown, default business-only. One selected product applies to all pasted links or CSV rows. Supports multiline link paste as well as CSV upload. Destination editor also permits optional group product assignment (additive; existing links remain). New/existing social account forms show platform-specific credential inputs directly, saved via existing Vault RPC after destination save. The destination ID is retained after partial failure to avoid duplicate account creation on retry. Blank credential inputs preserve stored values; platform changes clear unsaved token inputs.
+### 2.1 Tables
+- **`businesses`**: Brand/agency entity scoped to the owner user (`owner_id = auth.uid()`). Supports archiving via `archived_at`.
+- **`products`**: Products and services offered by businesses (`kind`: `product` / `service`).
+- **`destinations`**: Social media profiles, pages, and groups across Facebook, Instagram, LinkedIn, TikTok, and X. Tracks access tokens and token validity.
+- **`destination_products`**: Optional link between destinations (e.g. specific Facebook or LinkedIn groups) and specific products.
+- **`contents`**: Central idea, draft, script, and offer library.
+  - Links to `product_id` and `lead_magnet_id`.
+  - `cta_keyword`: Uppercase comment trigger keyword (e.g., `AGENT`, `GHL`).
+  - `comment_prompt`: Exact CTA copy (e.g., *"Comment AGENT to get my complete n8n workflow blueprint"*).
+  - `growth_goal`: Goal categorization (`lead_generation`, `audience_growth`, `authority`, `client_conversion`).
+- **`content_variants`**: Platform-specific adaptations of content (captions, platform hooks, hashtags).
+- **`posts`**: Actual scheduling and publication records with links and publication dates.
+- **`post_metrics`**: Cumulative metric snapshots (`reach`, `views`, `likes`, `comments`, `keyword_comments`, `dm_count`, `resource_requests`, `profile_visits`, `new_followers`, `inquiries`, `qualified_leads`, `orders`, `revenue`, `spend`).
+- **`assets`**: File attachments stored in Supabase Storage (`content-media`).
+- **`lead_magnets`**: Free resources, checklists, prompt packs, templates, or GitHub repos offered in exchange for comments/DMs.
+- **`audience_leads`**: People who commented keywords or sent DMs. Tracks handle, profile URL, contact details, potential client flag, and status (`new`, `contacted`, `qualified`, `unqualified`, `converted`, `archived`).
+- **`lead_interactions`**: Delivery log of resources sent, interaction types, channels, and follow-ups.
 
-## Group platform and filtering extension
-Migration 11 adds destinations.visibility (public/private/unknown), default unknown, and expands the group platform check to Facebook/LinkedIn. Existing approval_required remains independent of visibility. CSV recognizes platform from normalized hostname, validates optional platform column, and reads visibility and approval_required with form defaults. LinkedIn URLs use numeric /groups/ IDs. Duplicate matching uses full normalized URL including host. Groups view filters business, product (including business-only), platform, visibility, approval and active state. SQL 11 must run before saving groups with the new payload. User confirmed earlier group and credential storage worked; this new migration has not been executed by the agent.
+---
 
-## Single-Day Focus, One-Click Publishing & Business Classification
+## 3. Navigation & Views
+
+1. **Overview (`overview`)**:
+   - High-level KPIs: Total Content, Published Posts, Audience Leads, Potential Clients.
+   - Secondary CRM Bar: Active Lead Magnets, Resources Sent, Remaining Posts, Ready Content.
+   - Recent Content & Lead Magnet funnel snapshot.
+2. **Content Library (`library`)**:
+   - Content repository filterable by business, product, platform, format, and status.
+   - Detail sheet with tabs: Content, Lead Funnel, Versions, Files, Post History.
+3. **Post Tracker (`posts`)**:
+   - Multi-platform post scheduling and publication tracking.
+   - Bulk selection, bulk delete, and single delete with cascade cleanup of associated `post_metrics` snapshots.
+   - Quick recency scope filters: 'আজকের পোস্ট' (Today in Dhaka time with glowing badge), 'নতুন ও সাম্প্রতিক (৭ দিন)' (last 7 days), and 'সব পোস্ট' (all posts), ensuring today's and new posts are immediately accessible without manual date pickers.
+   - 1-click shortcut to add a lead directly from a published post.
+4. **Lead Magnets (`lead_magnets`)**:
+   - Free assets, trigger keywords, resource URLs, and funnel stages.
+   - Connected content volume and total leads acquired per lead magnet.
+5. **Audience & CRM (`crm`)**:
+   - Leads list with potential client highlights, platform links, and 1-click resource delivery toggle.
+   - Interaction log tracking comments, keyword usage, resource fulfillment, and follow-up reminders.
+6. **Calendar (`calendar`)**:
+   - Dhaka-time visual month calendar of scheduled and published posts.
+7. **Performance (`analytics`)**:
+   - Cumulative post metrics with sorting on reach, views, keyword comments, DMs, and inquiries.
+8. **Products & Services (`products`)**:
+   - Catalog management for offers and services.
+9. **Group Directory (`groups`)**:
+   - Management and CSV import for Facebook and LinkedIn communities.
+10. **Settings (`settings`)**:
+    - Business configuration and social destination credentials / token health monitoring.
+
+---
+
+## 4. Credentials and Automation
+Vault-backed secure storage via `05-social-credentials.sql`. RPCs `list_social_credentials`, `save_social_credential`, and `remove_social_credential` protect secrets with RLS policies. Stored values are password-masked and never exposed back in plain text to client interfaces.
+
+---
+
+## 5. Migration History
+
+| Script | Purpose | Status |
+|---|---|---|
+| `database/01-schema.sql` | Core schema (`businesses`, `destinations`, `contents`, `content_variants`, `posts`, `post_metrics`, `assets`) | Applied |
+| `database/05-social-credentials.sql` | Encrypted credentials and Vault RPCs | Applied |
+| `database/06-products-businesses.sql` | `products` table and business archiving | Applied |
+| `database/07-group-products-content-fields.sql` | `destination_products` and enriched content fields | Applied |
+| `database/11-group-platform-visibility.sql` | Group platform visibility and LinkedIn group support | Applied |
+| `database/12-lead-magnets-audience-crm.sql` | Adds `lead_magnets`, `audience_leads`, `lead_interactions`, content CTA fields, and comment metrics | Applied |
+| `database/13-reset-ai-automation.sql` | Resets/wipes all content and configures AI Automation & Personal Branding | Available for execution |
+
+---
+
+## 6. Build & Deployment Architecture
+
+- **Engine & Build Script**: The project uses `vinext` on Vite. Static production distribution is handled by `scripts/build.mjs` (invoked via `npm run build`), which executes `vinext build --prerender-all`.
+- **Static Artifact Aggregation**: Static pre-rendered route files (`dist/server/prerendered-routes/index.html` and `404.html`) and client JS/CSS bundles (`dist/client/*`) are mapped directly into root `dist/`.
+- **Vercel Hosting**: Configured via `vercel.json` with output directory `dist` and single-page application (SPA) rewrites to `/index.html`.
+- **Verification & Runtime Limits**: All core views, authentication, and database operations run client-side against Supabase. Server-side API endpoints on Vercel without a Node/Edge adapter are not supported in this static distribution mode.
+
+## 7. Group Platform & Filtering Extension
+Migration 11 adds `destinations.visibility` (public/private/unknown), default unknown, and expands the group platform check to Facebook/LinkedIn. Existing `approval_required` remains independent of visibility. CSV recognizes platform from normalized hostname, validates optional platform column, and reads visibility and `approval_required` with form defaults. LinkedIn URLs use numeric `/groups/` IDs. Duplicate matching uses full normalized URL including host. Groups view filters business, product (including business-only), platform, visibility, approval and active state. SQL 11 must run before saving groups with the new payload.
+
+## 8. Single-Day Focus, One-Click Publishing & Business Classification
 1. **Single-Day Workspace Scoping**: By default, `filters.dateMode` is `'single'` and defaults to the current day in Asia/Dhaka time. The Daily Control Bar (`.daily-bar`) provides previous/next day stepping, an inline HTML5 date picker, an instant "Back to Today" shortcut, and daily progress chips (contents, posted, remaining). All content-related views (Overview, Content Library, Post Tracker, Analytics) filter to the active day without mixing multiple days together. In Post Calendar, clicking any active day cell switches directly to that day's Content Library in single-day mode. Users can switch to `'all'` mode via the daily mode toggle if a broader view is needed.
 2. **One-Click "Mark as Posted"**: Content Library rows and the Content Detail sheet feature an instant `[পোস্ট সম্পন্ন]` button. Clicking it automatically ensures an associated platform variant (defaulting to Facebook / primary text) and active destination exist, creates or updates the post record with `status = 'published'`, `published_at = now()`, and a valid destination/platform URL (satisfying database publication constraints), and switches to a green `[পোস্ট হয়েছে]` toggle pill. Clicking an already published pill toggles the post back to planned/draft.
 3. **Content Deletion & Batch Reset**: Both individual content rows and the Content Detail sheet feature a delete action (`deleteContent`) protected by an `AlertDialog`. A batch `[সব কনটেন্ট মুছুন]` button (`deleteAllContent`) is available in the Content Library and Settings. Deletions strictly execute in cascade-safe dependency order (`post_metrics` -> `posts` -> `assets` -> `content_variants` -> `contents`) scoped to the authenticated user's active businesses, eliminating foreign key violation errors.
 4. **Physical / Digital Service Classification**: Replaces rigid ecommerce/agency terminology across the UI. Businesses and products are classified into `ডিজিটাল সার্ভিস (Digital Service)` (mapped internally to `agency` / `service` to preserve DB check constraints) and `ফিজিক্যাল (Physical)` (mapped to `ecom` / `product`). A filter for `businessKind` (`all`, `digital_service`, `physical`) is integrated into the workspace filter panel and settings.
-5. **AI Automation & Personal Branding Setup**: `setupAiAutomation()` in `app/workspace.tsx` and `database/12-reset-ai-automation.sql` provide a one-click setup configuring the user's primary business as "AI Automation" (`agency` / Digital Service) and primary product as "Personal Branding" (`service`), archiving other unneeded records to keep the workspace clutter-free.
-6. **Material Limitations**: Database tables enforce `check (kind in ('ecom', 'agency'))` on businesses and `check (kind in ('product', 'service'))` on products; UI terminology transparently bridges these to Digital Service and Physical without breaking unmigrated live database schemas. Live database content wiping requires either using the authenticated in-app reset buttons or executing `12-reset-ai-automation.sql` within the Supabase dashboard SQL editor.
+5. **AI Automation & Personal Branding Setup**: `setupAiAutomation()` in `app/workspace.tsx` and `database/13-reset-ai-automation.sql` provide a one-click setup configuring the user's primary business as "AI Automation" (`agency` / Digital Service) and primary product as "Personal Branding" (`service`), archiving other unneeded records to keep the workspace clutter-free.
+6. **Material Limitations**: Database tables enforce `check (kind in ('ecom', 'agency'))` on businesses and `check (kind in ('product', 'service'))` on products; UI terminology transparently bridges these to Digital Service and Physical without breaking unmigrated live database schemas. Live database content wiping requires either using the authenticated in-app reset buttons or executing `13-reset-ai-automation.sql` within the Supabase dashboard SQL editor.
