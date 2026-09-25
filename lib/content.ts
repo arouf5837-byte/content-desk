@@ -8,10 +8,15 @@ export const postStates:Record<string,string>={planned:'পরিকল্পি
 export const formats:Record<string,string>={text:'লেখা',image:'ছবি',carousel:'ক্যারোসেল',video:'ভিডিও',reel:'রিল / শর্ট ভিডিও',story:'স্টোরি'};
 export const intents:Record<string,string>={awareness:'পরিচিতি বাড়ানো',education:'বোঝানো / শেখানো',trust:'বিশ্বাস তৈরি',leads:'ইনকোয়ারি / লিড',sales:'বিক্রি',engagement:'আলোচনা / এনগেজমেন্ট',retention:'পুরোনো ক্রেতা ধরে রাখা'};
 export const sources:Record<string,string>={manual:'নিজে তৈরি',ai:'AI দিয়ে',mixed:'AI + নিজে'};
+export const businessKinds:Record<string,string>={all:'সব ধরন',digital_service:'ডিজিটাল সার্ভিস (Digital Service)',physical:'ফিজিক্যাল (Physical)'};
 export const metricLabels:Record<string,string>={reach:'রিচ',impressions:'ইমপ্রেশন',views:'ভিউ',likes:'লাইক',comments:'কমেন্ট',shares:'শেয়ার',saves:'সেভ',clicks:'ক্লিক',inquiries:'ইনকোয়ারি',qualified_leads:'যোগ্য লিড',booked_calls:'বুক করা কল',orders:'অর্ডার',revenue:'বিক্রির পরিমাণ',spend:'খরচ'};
-export type Filters={business:string;product:string;q:string;platform:string;status:string;format:string;source:string;destination:string;from:string;to:string;distribution:string};
-export const defaults:Filters={business:'all',product:'all',q:'',platform:'all',status:'all',format:'all',source:'all',destination:'all',from:'',to:'',distribution:'all'};
+export type Filters={business:string;businessKind:string;product:string;q:string;platform:string;status:string;format:string;source:string;destination:string;from:string;to:string;distribution:string;dateMode:'single'|'all';selectedDate:string};
+export function todayDate(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Dhaka',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
+export const defaults:Filters={business:'all',businessKind:'all',product:'all',q:'',platform:'all',status:'all',format:'all',source:'all',destination:'all',from:'',to:'',distribution:'all',dateMode:'single',selectedDate:todayDate()};
 export function localDate(iso?:string|null){if(!iso)return '';return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Dhaka',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date(iso))}
+export function shiftDate(dateStr:string,delta:number){const [y,m,d]=(dateStr||todayDate()).split('-').map(Number);const dt=new Date(Date.UTC(y,m-1,d));dt.setUTCDate(dt.getUTCDate()+delta);return dt.toISOString().slice(0,10)}
+export function formatBanglaDay(dateStr?:string|null){if(!dateStr)return '—';const today=todayDate();const [y,m,d]=dateStr.split('-').map(Number);const dt=new Date(Date.UTC(y,m-1,d));const banglaDate=dt.toLocaleDateString('bn-BD',{timeZone:'Asia/Dhaka',weekday:'short',day:'numeric',month:'short',year:'numeric'});if(dateStr===today)return `আজ · ${banglaDate}`;if(dateStr===shiftDate(today,-1))return `গতকাল · ${banglaDate}`;if(dateStr===shiftDate(today,1))return `আগামীকাল · ${banglaDate}`;return banglaDate}
+export function businessKindLabel(kind?:string|null){if(!kind)return 'ডিজিটাল সার্ভিস';if(['agency','digital_service','service'].includes(kind))return 'ডিজিটাল সার্ভিস';if(['ecom','physical','product'].includes(kind))return 'ফিজিক্যাল';return kind}
 export function localInput(iso?:string|null){if(!iso)return '';const p=new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Dhaka',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date(iso));const v=(k:string)=>p.find(x=>x.type===k)?.value;return v('year')+'-'+v('month')+'-'+v('day')+'T'+v('hour')+':'+v('minute')}
 export function fromInput(value:string){return value?new Date(value+':00+06:00').toISOString():null}
 export function dateLabel(value?:string|null,time=false){return value?new Date(value).toLocaleString('bn-BD',{timeZone:'Asia/Dhaka',day:'numeric',month:'short',year:'numeric',...(time?{hour:'numeric',minute:'2-digit'}:{})}):'—'}
@@ -19,15 +24,28 @@ export function number(value:unknown){return value==null?'—':Number(value).toL
 export function postDate(p:Row){return p.published_at||p.scheduled_at||p.submitted_at||p.created_at}
 export function latestMetrics(rows:Row[],asOf?:string){const map=new Map<string,Row>();for(const r of rows){if(asOf&&localDate(r.measured_at)>asOf)continue;const old=map.get(r.post_id);if(!old||new Date(r.measured_at).getTime()>new Date(old.measured_at).getTime())map.set(r.post_id,r)}return map}
 export function filtered(data:Data,f:Filters,mode:string){
- const activeBusinesses=new Set(data.businesses.filter(b=>!b.archived_at).map(b=>b.id));
+ const kindMatch=(b:Row)=>{if(!f.businessKind||f.businessKind==='all')return true;if(f.businessKind==='digital_service')return ['agency','digital_service'].includes(b.kind);if(f.businessKind==='physical')return ['ecom','physical'].includes(b.kind);return true};
+ const activeBusinesses=new Set(data.businesses.filter(b=>!b.archived_at&&kindMatch(b)).map(b=>b.id));
  const business=(r:Row)=>activeBusinesses.has(r.business_id)&&(f.business==='all'||r.business_id===f.business);
- const period=(value:string)=>{const d=localDate(value);return(!f.from||d>=f.from)&&(!f.to||d<=f.to)};
+ const isSingle=f.dateMode==='single';
+ const targetDay=f.selectedDate||todayDate();
+ const period=(value:string)=>{const d=localDate(value);if(isSingle)return d===targetDay;return(!f.from||d>=f.from)&&(!f.to||d<=f.to)};
  const contentMatch=(c:Row)=>business(c)&&(f.product==='all'||(f.product==='none'?!c.product_id:c.product_id===f.product))&&(f.format==='all'||c.format===f.format)&&(f.source==='all'||c.source===f.source)&&(!f.q||[c.title,c.topic,c.offer_name,c.content_pillar,c.target_audience,c.hook,c.cta,c.brief,c.script,...(c.tags||[])].filter(Boolean).join(' ').toLowerCase().includes(f.q.toLowerCase()));
  const candidates=data.contents.filter(contentMatch);
  const ids=new Set(candidates.map(c=>c.id));
  const variants=new Map(data.content_variants.map(v=>[v.id,v]));
  const posts=data.posts.filter(p=>business(p)&&ids.has(variants.get(p.variant_id)?.content_id)&&(f.platform==='all'||p.platform===f.platform)&&(f.destination==='all'||p.destination_id===f.destination)&&(f.distribution==='all'||p.distribution===f.distribution)&&(mode==='library'||f.status==='all'||p.status===f.status)&&period(postDate(p)));
- const contents=candidates.filter(c=>(mode!=='library'||f.status==='all'||c.status===f.status)&&period(c.created_at)&&(f.platform==='all'||data.content_variants.some(v=>v.content_id===c.id&&v.platform===f.platform))&&(f.destination==='all'||posts.some(p=>variants.get(p.variant_id)?.content_id===c.id)));
+ const contents=candidates.filter(c=>{
+  if(mode==='library'&&f.status!=='all'&&c.status!==f.status)return false;
+  if(f.platform!=='all'&&!data.content_variants.some(v=>v.content_id===c.id&&v.platform===f.platform))return false;
+  if(f.destination!=='all'&&!posts.some(p=>variants.get(p.variant_id)?.content_id===c.id))return false;
+  if(isSingle){
+   const createdOnDay=localDate(c.created_at)===targetDay;
+   const postOnDay=data.posts.some(p=>variants.get(p.variant_id)?.content_id===c.id&&localDate(postDate(p))===targetDay);
+   return createdOnDay||postOnDay;
+  }
+  return period(c.created_at);
+ });
  return {contents,posts};
 }
 export function errorText(e:unknown){const x=e as {message?:string;code?:string};if(x.code==='23505')return 'এই তথ্যটি আগে থেকেই আছে। নাম বা ধরন পরীক্ষা করো।';if(x.code==='23503')return 'সম্পর্কিত বিজনেস, কনটেন্ট বা অ্যাকাউন্ট পাওয়া যায়নি। রিফ্রেশ করে চেষ্টা করো।';if(x.code==='42501')return 'এই কাজের অনুমতি পাওয়া যায়নি। নিজের অ্যাকাউন্ট দিয়ে লগইন করো।';return x.message||'সংরক্ষণ করা যায়নি। আবার চেষ্টা করো।'}

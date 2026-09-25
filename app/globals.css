@@ -21,3 +21,41 @@
 @media(max-width:767px){.product-grid{grid-template-columns:1fr;padding:0 16px 16px}.catalog-search{margin:0 16px 17px}.product-card{padding:18px}.saved-media-grid{grid-template-columns:1fr}.filter-row>.desk-select{min-width:150px}}
 
 .group-controls{display:flex;gap:12px;padding:0 22px 22px}.group-url{max-width:340px;overflow:hidden;text-overflow:ellipsis}.csv-dialog{width:min(900px,calc(100vw - 32px))!important;max-width:900px!important;max-height:90svh;overflow:auto;padding:26px!important}.csv-dialog [data-slot=dialog-title]{font-size:23px}.csv-dialog>.upload-box{padding:17px}.csv-counts{display:flex;gap:13px;flex-wrap:wrap;font-size:14px;color:#6c8476}.csv-counts>span{padding:6px 10px;background:#f0f5f2;border-radius:6px}.csv-preview{border:1px solid var(--border);border-radius:9px;overflow:hidden}.csv-preview td,.csv-preview th{padding:12px;font-size:13px}.csv-preview .status{white-space:normal;min-width:160px}.csv-preview .group-url{max-width:330px}.csv-dialog>.small code{font-size:12px}@media(max-width:767px){.group-controls{flex-wrap:wrap;padding:0 16px 17px}.panel-heading:has(.row-actions){flex-wrap:wrap}.csv-dialog{padding:20px!important}.group-url{max-width:210px}}
+
+/* Daily Control Bar & Single-Day Focus */
+.daily-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;background:white;border:1px solid var(--border);border-radius:12px;padding:12px 20px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.02);flex-wrap:wrap}
+.daily-nav{display:flex;align-items:center;gap:10px}
+.daily-display{display:flex;align-items:center;gap:10px;background:#f4f9f6;border:1px solid #d4eae0;padding:6px 14px;border-radius:9px;color:#145242;font-size:14px;font-weight:600}
+.daily-display svg{color:#1e725b}
+.daily-picker{border:none!important;background:transparent!important;padding:0!important;font-size:13px!important;color:#496155!important;cursor:pointer;outline:none!important;box-shadow:none!important;width:125px}
+.daily-stats{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.day-stat-chip{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;background:#fafbfc;border:1px solid #e7ecf0;border-radius:20px;font-size:13px;color:#5c6b7a}
+.day-stat-chip strong{color:#1b2836;font-weight:650}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.dot-green{background:#2bb373}
+.dot-blue{background:#4177d6}
+.dot-amber{background:#dca337}
+.daily-mode-switch{display:flex;align-items:center;background:#edf2f5;padding:3px;border-radius:8px;gap:2px}
+.mode-btn{border:none;background:transparent;padding:6px 13px;border-radius:6px;font-size:12px;font-weight:600;color:#677484;cursor:pointer;transition:all .15s}
+.mode-btn.active{background:white;color:#155947;box-shadow:0 1px 2px rgba(0,0,0,0.06)}
+.small-btn{padding:5px 10px;min-height:32px;font-size:12px}
+
+/* 1-Click Posted Button & Action Pills */
+.mark-posted-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid #b8e0cc;background:#eef8f3;color:#196847;padding:6px 12px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.mark-posted-btn:hover{background:#176653;color:white;border-color:#176653}
+.posted-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #c2e6d2;background:#ebf7f0;color:#186846;padding:5px 11px;border-radius:8px;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer}
+.posted-pill:hover{background:#d7f0e1}
+.posted-pill.active{border-color:#a0dac0;background:#e5f7ee}
+
+/* Danger actions & trash */
+.danger-btn{border-color:#f1c8c8;color:#b83a3a;background:#fff8f8}
+.danger-btn:hover{background:#b83a3a;color:white;border-color:#b83a3a}
+.icon-button.danger{color:#a94444}
+.icon-button.danger:hover{background:#fdeeee;border-color:#f5caca}
+
+/* Quick Setup Card & Clean Header */
+.setup-box{display:flex;align-items:center;justify-content:space-between;gap:18px;background:linear-gradient(135deg,#eff9f4 0%,#f5fcf8 100%);border:1px solid #cee8dc;padding:16px 22px;border-radius:12px;margin-bottom:22px}
+.setup-box h3{font-size:15px;color:#184a3c;margin-bottom:3px}
+.setup-box p{font-size:13px;color:#5a786d;margin:0}
+.kind-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:3px 8px;border-radius:6px;background:#eef4fb;color:#355c8c;font-weight:500}
+.kind-badge.service{background:#e8f6f0;color:#216d4c}

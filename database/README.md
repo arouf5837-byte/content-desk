@@ -6,4 +6,6 @@ For a fresh project: 01-schema.sql, 05-social-credentials.sql, 06-products-busin
 
 04-check.sql and 10-inspect-group-schema.sql are diagnostic queries. Confirm live schema before applying any repair. Production migration completion cannot be inferred from the presence of these files.
 
+12-reset-ai-automation.sql is a reset utility script to wipe all contents and configure the active business as 'AI Automation' (Digital Service) and product as 'Personal Branding'.
+
 Legacy failed repair attempts and demo/business seeds are intentionally not included. Keep automation credentials in Vault, not SQL or source control.
