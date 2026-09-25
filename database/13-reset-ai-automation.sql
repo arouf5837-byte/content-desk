@@ -1,18 +1,40 @@
--- Content Desk: 12-reset-ai-automation.sql
+-- Content Desk: 13-reset-ai-automation.sql
 -- Run this script in the Supabase SQL Editor if you wish to reset directly in the database.
--- 1. Deletes all post metrics, posts, assets, variants, and contents.
+-- 1. Deletes all lead interactions, audience leads, lead magnets, post metrics, posts, assets, variants, and contents.
 -- 2. Sets the active business to 'AI Automation' (Digital Service).
 -- 3. Sets the product to 'Personal Branding' (Digital Service).
 -- 4. Archives all other businesses and products.
 
 begin;
 
--- Step 1: Wipe all content and post records in cascade-safe order
-delete from public.post_metrics;
-delete from public.posts;
-delete from public.assets;
-delete from public.content_variants;
-delete from public.contents;
+-- Step 1: Wipe all content, posts, lead magnets, and CRM records in cascade-safe order
+do $$
+begin
+  if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'lead_interactions') then
+    execute 'delete from public.lead_interactions';
+  end if;
+  if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'audience_leads') then
+    execute 'delete from public.audience_leads';
+  end if;
+  if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'post_metrics') then
+    execute 'delete from public.post_metrics';
+  end if;
+  if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'posts') then
+    execute 'delete from public.posts';
+  end if;
+  if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'assets') then
+    execute 'delete from public.assets';
+  end if;
+  if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'content_variants') then
+    execute 'delete from public.content_variants';
+  end if;
+  if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'contents') then
+    execute 'delete from public.contents';
+  end if;
+  if exists (select 1 from information_schema.tables where table_schema = 'public' and table_name = 'lead_magnets') then
+    execute 'delete from public.lead_magnets';
+  end if;
+end $$;
 
 -- Step 2: Configure primary business as 'AI Automation'
 -- If a business exists, update the first one; otherwise insert a new one.
