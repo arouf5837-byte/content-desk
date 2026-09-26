@@ -2,7 +2,7 @@ export type Row = {id:string;[key:string]:any};
 export type Data = Record<string,Row[]>;
 export const tables=['businesses','destinations','contents','content_variants','assets','posts','post_metrics','products','destination_products','lead_magnets','audience_leads','lead_interactions'];
 export const emptyData:Data=Object.fromEntries(tables.map(t=>[t,[]]));
-export const platforms:Record<string,string>={facebook:'Facebook',instagram:'Instagram',tiktok:'TikTok',linkedin:'LinkedIn',x:'X / Twitter',other:'অন্যান্য'};
+export const platforms:Record<string,string>={facebook:'Facebook',instagram:'Instagram',youtube:'YouTube',tiktok:'TikTok',linkedin:'LinkedIn',x:'X / Twitter',other:'অন্যান্য'};
 export const contentStates:Record<string,string>={idea:'আইডিয়া',draft:'খসড়া',review:'রিভিউ',ready:'প্রস্তুত',archived:'আর্কাইভ'};
 export const postStates:Record<string,string>={planned:'পরিকল্পিত',scheduled:'নির্ধারিত',pending_approval:'অনুমোদনের অপেক্ষায়',published:'প্রকাশিত',failed:'ব্যর্থ',rejected:'প্রত্যাখ্যাত',cancelled:'বাতিল'};
 export const formats:Record<string,string>={text:'লেখা',image:'ছবি',carousel:'ক্যারোসেল',video:'ভিডিও',reel:'রিল / শর্ট ভিডিও',story:'স্টোরি'};
@@ -51,6 +51,7 @@ export const channels:Record<string,string>={
  dm:'ডিএম / মেসেজ',
  email:'ইমেইল',
  call:'কল',
+ youtube_comment:'ইউটিউব কমেন্ট',
  other:'অন্যান্য'
 };
 
@@ -197,7 +198,7 @@ export function filtered(data:Data,f:Filters,mode:string){
  });
  return {contents,posts};
 }
-export function errorText(e:unknown){const x=e as {message?:string;code?:string};if(x.code==='23505')return 'এই তথ্যটি আগে থেকেই আছে। নাম বা ধরন পরীক্ষা করো।';if(x.code==='23503')return 'সম্পর্কিত বিজনেস, কনটেন্ট বা অ্যাকাউন্ট পাওয়া যায়নি। রিফ্রেশ করে চেষ্টা করো।';if(x.code==='42501')return 'এই কাজের অনুমতি পাওয়া যায়নি। নিজের অ্যাকাউন্ট দিয়ে লগইন করো।';return x.message||'সংরক্ষণ করা যায়নি। আবার চেষ্টা করো।'}
+export function errorText(e:unknown){const x=e as {message?:string;code?:string};if(x.code==='23505')return 'এই তথ্যটি আগে থেকেই আছে। নাম বা ধরন পরীক্ষা করো।';if(x.code==='23503')return 'সম্পর্কিত বিজনেস, কনটেন্ট বা অ্যাকাউন্ট পাওয়া যায়নি। রিফ্রেশ করে চেষ্টা করো।';if(x.code==='42501')return 'এই কাজের অনুমতি পাওয়া যায়নি। নিজের অ্যাকাউন্ট দিয়ে লগইন করো।';if(x.code==='23514'){if(x.message?.includes('platform'))return 'প্ল্যাটফর্ম ডাটাবেজে অনুমোদিত নয়। Supabase SQL Editor-এ 14-add-youtube-platform.sql স্ক্রিপ্টটি চালান।';if(x.message?.includes('destination_type'))return 'চ্যানেল বা অ্যাকাউন্টের ধরন ডাটাবেজে অনুমোদিত নয়। Supabase SQL Editor-এ 14-add-youtube-platform.sql স্ক্রিপ্টটি চালান।';return 'প্রদত্ত তথ্য ডাটাবেজের নিয়ম লঙ্ঘন করেছে (Check constraint)।';}return x.message||'সংরক্ষণ করা যায়নি। আবার চেষ্টা করো।'}
 
 export function getToken(d?: Row | null): string {
   if (!d) return '';

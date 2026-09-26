@@ -4,7 +4,8 @@
 
 **Content Desk** is an integrated Personal Brand, Content Production, Product Catalog, Lead Magnet Delivery, and Lightweight CRM system built for creators and agency founders focusing on AI automation, AI agents, n8n, GoHighLevel (GHL), voice AI, and business automation workflows.
 
-The system powers a **comment-driven inbound growth engine** across 5 primary social channels:
+The system powers a **comment-driven inbound growth engine** across 6 primary social channels:
+- YouTube Channels
 - LinkedIn
 - Instagram
 - X / Twitter

@@ -8,4 +8,6 @@ For a fresh project: 01-schema.sql, 05-social-credentials.sql, 06-products-busin
 
 13-reset-ai-automation.sql is a reset utility script to wipe all contents, lead magnets, CRM leads, and configure the active business as 'AI Automation' (Digital Service) and product as 'Personal Branding'.
 
+14-add-youtube-platform.sql enables YouTube as a first-class social platform and 'channel' as a destination type across destinations, content_variants, posts, and audience_leads. Run in Supabase SQL Editor.
+
 Legacy failed repair attempts and demo/business seeds are intentionally not included. Keep automation credentials in Vault, not SQL or source control.
