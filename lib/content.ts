@@ -131,11 +131,15 @@ export function dateMatchesFilter(iso?: string | null, f?: Filters) {
  if (!iso || !f) return true;
  const d = localDate(iso);
  if (!d) return false;
- const hasRange = Boolean(f.from || f.to);
- if (hasRange) {
-  if (f.from && f.to) return d >= f.from && d <= f.to;
-  if (f.from) return d >= f.from;
-  if (f.to) return d <= f.to;
+ if (f.from && f.to) {
+  if (f.from === f.to) return d === f.from;
+  return d >= f.from && d <= f.to;
+ }
+ if (f.from && !f.to) {
+  return d === f.from;
+ }
+ if (!f.from && f.to) {
+  return d <= f.to;
  }
  if (f.dateMode === 'single') {
   return d === (f.selectedDate || todayDate());
@@ -156,10 +160,15 @@ export function filtered(data:Data,f:Filters,mode:string){
   if (!iso) return false;
   const d = localDate(iso);
   if (!d) return false;
-  if (hasRange) {
-   if (f.from && f.to) return d >= f.from && d <= f.to;
-   if (f.from) return d >= f.from;
-   if (f.to) return d <= f.to;
+  if (f.from && f.to) {
+   if (f.from === f.to) return d === f.from;
+   return d >= f.from && d <= f.to;
+  }
+  if (f.from && !f.to) {
+   return d === f.from;
+  }
+  if (!f.from && f.to) {
+   return d <= f.to;
   }
   if (isSingle) {
    return d === targetDay;
@@ -179,15 +188,10 @@ export function filtered(data:Data,f:Filters,mode:string){
   if(f.platform!=='all'&&!data.content_variants.some(v=>v.content_id===c.id&&v.platform===f.platform))return false;
   if(f.destination!=='all'&&!posts.some(p=>variants.get(p.variant_id)?.content_id===c.id))return false;
 
-  if(isSingle){
-   const createdOnDay=localDate(c.created_at)===targetDay;
-   const postOnDay=data.posts.some(p=>variants.get(p.variant_id)?.content_id===c.id&&localDate(postDate(p))===targetDay);
-   return createdOnDay||postOnDay;
-  }
-  if(hasRange){
-   const createdInRange=matchesDate(c.created_at);
-   const postInRange=data.posts.some(p=>variants.get(p.variant_id)?.content_id===c.id&&matchesDate(postDate(p)));
-   return createdInRange||postInRange;
+  if (isSingle || hasRange) {
+   const createdMatches = matchesDate(c.created_at);
+   const postMatches = data.posts.some(p => variants.get(p.variant_id)?.content_id === c.id && matchesDate(postDate(p)));
+   return createdMatches || postMatches;
   }
   return true;
  });

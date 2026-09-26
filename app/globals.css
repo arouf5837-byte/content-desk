@@ -204,3 +204,12 @@ button.keyword-badge:hover{background:#dcf0e7;border-color:#a5cfbd}
   .panel th,.panel td{padding:8px 7px!important;font-size:12.5px!important}
 }
 
+.filter-date-chip{display:inline-flex;align-items:center;gap:6px;background:var(--card,#14171f);border:1px solid var(--border,#282d3d);border-radius:8px;padding:4px 10px;height:38px;color:var(--text,#e2e8f0);font-size:13px;transition:border-color .2s}
+.filter-date-chip:focus-within{border-color:var(--primary,#6366f1)}
+.filter-date-chip svg{color:var(--muted,#94a3b8);flex-shrink:0}
+.filter-date-input{background:transparent;border:0;outline:none;color:inherit;font-size:12.5px;font-family:inherit;cursor:pointer}
+.filter-date-input::-webkit-calendar-picker-indicator{filter:invert(0.8);cursor:pointer}
+.clear-date-btn{display:inline-flex;align-items:center;justify-content:center;background:none;border:none;color:var(--muted,#94a3b8);cursor:pointer;padding:2px;border-radius:4px;transition:color .15s}
+.clear-date-btn:hover{color:#ef4444}
+
+
