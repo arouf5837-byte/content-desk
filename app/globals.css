@@ -178,3 +178,29 @@ button.keyword-badge:hover{background:#dcf0e7;border-color:#a5cfbd}
 .dest-badge-link.default-link .dest-badge-icon{color:#4f84b5}
 .dest-add-inline-btn{background:transparent;border:1px dashed #abc5b7;color:#3f6a56;border-radius:6px;padding:5px 9px;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s}
 .dest-add-inline-btn:hover{background:#eaf3ee;border-color:#7da592;color:#1a4d37}
+
+/* Compact Table Layout - No horizontal scroll */
+.panel table{font-size:13.5px;width:100%;border-collapse:collapse}
+.panel th{padding:10px 12px!important;font-size:12px!important;white-space:nowrap}
+.panel td{padding:11px 12px!important;font-size:13px!important;white-space:normal}
+.panel td.tabular,.panel td .tabular{white-space:nowrap}
+.compact-table td{padding:10px 11px!important}
+.biz-offer-cell{display:flex;flex-direction:column;gap:3px;align-items:flex-start}
+.biz-offer-cell .business-tag{max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.status-date-cell{display:flex;flex-direction:column;gap:4px;align-items:flex-start}
+.content-title{display:flex;align-items:center;gap:10px;text-align:left;background:none;border:0}
+.content-title strong{font-size:13.5px;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block}
+.format-icon{width:34px!important;height:35px!important;border-radius:8px}
+.mark-posted-btn,.posted-pill{padding:5px 10px!important;font-size:12px!important;gap:5px!important;height:32px!important;min-height:32px!important;white-space:nowrap}
+.th-actions,.td-actions{width:95px;min-width:95px;text-align:right}
+.td-actions .row-actions{justify-content:flex-end}
+@media(max-width:1450px){
+  .workspace-body{padding:22px 20px!important}
+  .content-title strong{max-width:200px}
+  .panel th,.panel td{padding:9px 9px!important}
+}
+@media(max-width:1150px){
+  .content-title strong{max-width:160px}
+  .panel th,.panel td{padding:8px 7px!important;font-size:12.5px!important}
+}
+
