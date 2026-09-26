@@ -127,28 +127,69 @@ export function friendlyDate(value?:string|null,time=false){if(!value)return 'â€
 export function number(value:unknown){return value==null?'â€”':Number(value).toLocaleString('bn-BD')}
 export function postDate(p:Row){return p.published_at||p.scheduled_at||p.submitted_at||p.created_at}
 export function latestMetrics(rows:Row[],asOf?:string){const map=new Map<string,Row>();for(const r of rows){if(asOf&&localDate(r.measured_at)>asOf)continue;const old=map.get(r.post_id);if(!old||new Date(r.measured_at).getTime()>new Date(old.measured_at).getTime())map.set(r.post_id,r)}return map}
+export function dateMatchesFilter(iso?: string | null, f?: Filters) {
+ if (!iso || !f) return true;
+ const d = localDate(iso);
+ if (!d) return false;
+ const hasRange = Boolean(f.from || f.to);
+ if (hasRange) {
+  if (f.from && f.to) return d >= f.from && d <= f.to;
+  if (f.from) return d >= f.from;
+  if (f.to) return d <= f.to;
+ }
+ if (f.dateMode === 'single') {
+  return d === (f.selectedDate || todayDate());
+ }
+ return true;
+}
+
 export function filtered(data:Data,f:Filters,mode:string){
  const kindMatch=(b:Row)=>{if(!f.businessKind||f.businessKind==='all')return true;if(f.businessKind==='digital_service')return ['agency','digital_service'].includes(b.kind);if(f.businessKind==='physical')return ['ecom','physical'].includes(b.kind);return true};
  const activeBusinesses=new Set(data.businesses.filter(b=>!b.archived_at&&kindMatch(b)).map(b=>b.id));
  const business=(r:Row)=>activeBusinesses.has(r.business_id)&&(f.business==='all'||r.business_id===f.business);
- const isSingle=f.dateMode==='single';
- const targetDay=f.selectedDate||todayDate();
- const period=(value:string)=>{const d=localDate(value);if(isSingle)return d===targetDay;return(!f.from||d>=f.from)&&(!f.to||d<=f.to)};
+
+ const hasRange = Boolean(f.from || f.to);
+ const isSingle = !hasRange && f.dateMode === 'single';
+ const targetDay = f.selectedDate || todayDate();
+
+ const matchesDate = (iso?: string | null) => {
+  if (!iso) return false;
+  const d = localDate(iso);
+  if (!d) return false;
+  if (hasRange) {
+   if (f.from && f.to) return d >= f.from && d <= f.to;
+   if (f.from) return d >= f.from;
+   if (f.to) return d <= f.to;
+  }
+  if (isSingle) {
+   return d === targetDay;
+  }
+  return true;
+ };
+
  const contentMatch=(c:Row)=>business(c)&&(f.product==='all'||(f.product==='none'?!c.product_id:c.product_id===f.product))&&(f.format==='all'||c.format===f.format)&&(f.source==='all'||c.source===f.source)&&(!f.q||[c.title,c.topic,c.offer_name,c.content_pillar,c.target_audience,c.hook,c.cta,c.brief,c.script,...(c.tags||[])].filter(Boolean).join(' ').toLowerCase().includes(f.q.toLowerCase()));
  const candidates=data.contents.filter(contentMatch);
  const ids=new Set(candidates.map(c=>c.id));
  const variants=new Map(data.content_variants.map(v=>[v.id,v]));
- const posts=data.posts.filter(p=>business(p)&&ids.has(variants.get(p.variant_id)?.content_id)&&(f.platform==='all'||p.platform===f.platform)&&(f.destination==='all'||p.destination_id===f.destination)&&(f.distribution==='all'||p.distribution===f.distribution)&&(mode==='library'||f.status==='all'||p.status===f.status)&&period(postDate(p)));
+
+ const posts=data.posts.filter(p=>business(p)&&ids.has(variants.get(p.variant_id)?.content_id)&&(f.platform==='all'||p.platform===f.platform)&&(f.destination==='all'||p.destination_id===f.destination)&&(f.distribution==='all'||p.distribution===f.distribution)&&(mode==='library'||f.status==='all'||p.status===f.status)&&matchesDate(postDate(p)));
+
  const contents=candidates.filter(c=>{
   if(mode==='library'&&f.status!=='all'&&c.status!==f.status)return false;
   if(f.platform!=='all'&&!data.content_variants.some(v=>v.content_id===c.id&&v.platform===f.platform))return false;
   if(f.destination!=='all'&&!posts.some(p=>variants.get(p.variant_id)?.content_id===c.id))return false;
+
   if(isSingle){
    const createdOnDay=localDate(c.created_at)===targetDay;
    const postOnDay=data.posts.some(p=>variants.get(p.variant_id)?.content_id===c.id&&localDate(postDate(p))===targetDay);
    return createdOnDay||postOnDay;
   }
-  return period(c.created_at);
+  if(hasRange){
+   const createdInRange=matchesDate(c.created_at);
+   const postInRange=data.posts.some(p=>variants.get(p.variant_id)?.content_id===c.id&&matchesDate(postDate(p)));
+   return createdInRange||postInRange;
+  }
+  return true;
  });
  return {contents,posts};
 }

@@ -141,3 +141,40 @@
 .delete-icon:hover{color:#bd3232!important;background:#feecec!important;border-color:#f6cece!important}
 .confirm-dialog{max-width:470px!important;padding:24px!important;border-radius:14px!important}
 @media(max-width:767px){.bulk-action-bar{left:12px;right:12px;transform:none;width:auto;flex-wrap:wrap;gap:10px;bottom:14px;justify-content:space-between}.bulk-actions{width:100%;justify-content:flex-end}}
+
+/* Lead Magnet Interactive Elements */
+button.keyword-badge{cursor:pointer;transition:all .15s}
+button.keyword-badge:hover{background:#dcf0e7;border-color:#a5cfbd}
+.lead-magnet-counts{display:inline-flex;align-items:center;gap:6px}
+.lead-magnet-counts span{color:#a0abb8}
+.lead-magnet-counts .text-button{font-size:13px;padding:0}
+
+/* Date Filtering & Range Enhancements */
+.range-active-chip{background:#e7f0eb!important;color:#186854!important;border:1px solid #c7ded3!important;display:inline-flex;align-items:center;gap:6px}
+.clear-chip-btn{background:transparent;border:0;cursor:pointer;display:inline-flex;align-items:center;color:#6b8277;padding:0}
+.clear-chip-btn:hover{color:#bd3232}
+.date-filter-group{grid-column:1/-1;display:flex;flex-direction:column;gap:10px}
+.date-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.date-presets{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:#687788}
+.preset-btn{background:#f1f5f3;border:1px solid #d2e0d9;color:#355347;border-radius:6px;padding:4px 10px;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.preset-btn:hover{background:#e1ede7;border-color:#abc5b9}
+.preset-btn.clear{background:#feecec;border-color:#f6cece;color:#c03434}
+.preset-btn.clear:hover{background:#fcdcdc}
+
+/* Post Variant Direct Links & Copy */
+.copy-variant-btn{height:30px!important;min-height:30px!important;padding:4px 10px!important;font-size:12px!important;gap:5px!important;border-radius:6px!important;background:#edf5f1!important;color:#186854!important;border-color:#c2dcce!important}
+.copy-variant-btn:hover{background:#dcf0e7!important;border-color:#a5cfbd!important}
+.variant-dest-box{margin-top:14px;padding:12px 14px;background:#f8faf9;border:1px solid #e2ebe6;border-radius:8px}
+.variant-dest-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.variant-dest-title{font-size:12px;font-weight:600;color:#5a6d63;text-transform:none}
+.variant-dest-links{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.dest-badge-link{display:inline-flex;align-items:center;gap:6px;background:#ffffff;border:1px solid #cfe0d7;color:#1f5e49;padding:5px 10px;border-radius:6px;font-size:12px;text-decoration:none;transition:all .15s}
+.dest-badge-link:hover{background:#edf5f1;border-color:#a2cfba;color:#124535;text-decoration:none;transform:translateY(-1px);box-shadow:0 2px 5px rgba(0,0,0,0.04)}
+.dest-badge-type{background:#e7f0eb;color:#186854;font-size:10px;font-weight:600;padding:2px 5px;border-radius:4px;letter-spacing:0.3px}
+.dest-badge-name{font-weight:600;color:#293b32}
+.dest-badge-icon{color:#6c8a7b}
+.dest-badge-link.default-link{background:#f0f5fa;border-color:#cde0f1;color:#225c94}
+.dest-badge-link.default-link:hover{background:#e2eef9;border-color:#a9cceb;color:#134371}
+.dest-badge-link.default-link .dest-badge-icon{color:#4f84b5}
+.dest-add-inline-btn{background:transparent;border:1px dashed #abc5b7;color:#3f6a56;border-radius:6px;padding:5px 9px;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s}
+.dest-add-inline-btn:hover{background:#eaf3ee;border-color:#7da592;color:#1a4d37}
