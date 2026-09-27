@@ -10,4 +10,6 @@ For a fresh project: 01-schema.sql, 05-social-credentials.sql, 06-products-busin
 
 14-add-youtube-platform.sql enables YouTube as a first-class social platform and 'channel' as a destination type across destinations, content_variants, posts, and audience_leads. Run in Supabase SQL Editor.
 
+15-add-variant-title-thumbnail.sql adds title and thumbnail_url to content_variants for YouTube and platform video materials. Run in Supabase SQL Editor.
+
 Legacy failed repair attempts and demo/business seeds are intentionally not included. Keep automation credentials in Vault, not SQL or source control.
