@@ -374,5 +374,192 @@ button.keyword-badge:hover{background:#dcf0e7;border-color:#a5cfbd}
   cursor: pointer;
 }
 
+/* ========================================================
+   LIVE POST URL & AI TRACKING COMPONENT STYLES
+   ======================================================== */
+.live-post-url-section {
+  margin: 14px 0 10px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-left: 3.5px solid #10b981;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.live-post-url-section:hover {
+  border-color: #cbd5e1;
+  border-left-color: #059669;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.live-post-url-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.live-post-url-icon {
+  color: #059669;
+  flex-shrink: 0;
+}
+
+.live-post-url-title {
+  font-size: 13px;
+  font-weight: 650;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.live-post-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #047857;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.live-post-saved-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 7px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.live-post-saved-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 220px;
+  flex: 1;
+}
+
+.live-post-url-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0284c7;
+  text-decoration: none;
+  word-break: break-all;
+  transition: color 0.15s;
+}
+
+.live-post-url-link:hover {
+  color: #0369a1;
+  text-decoration: underline;
+}
+
+.live-post-url-text {
+  max-width: 380px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.live-post-meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11.5px;
+  color: #64748b;
+  flex-wrap: wrap;
+}
+
+.live-post-ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 6px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1d4ed8;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 4px;
+}
+
+.live-post-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.live-post-metric-btn {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border-color: #059669 !important;
+}
+
+.live-post-metric-btn:hover {
+  background: #059669 !important;
+}
+
+.live-post-input-box {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.live-post-input-wrapper {
+  flex: 1;
+  min-width: 220px;
+}
+
+.live-post-url-input {
+  width: 100%;
+  padding: 7px 11px;
+  font-size: 13px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+.live-post-url-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.live-post-input-btns {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.live-post-save-btn {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.live-post-hint {
+  margin-top: 8px !important;
+  margin-bottom: 0 !important;
+  font-size: 11.5px !important;
+  color: #64748b !important;
+  line-height: 1.5 !important;
+}
+
+
 
 
