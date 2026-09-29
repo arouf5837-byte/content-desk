@@ -80,6 +80,26 @@ export const growthGoals:Record<string,string>={
  client_conversion:'ক্লায়েন্ট অর্জন'
 };
 
+export const noteCategories:Record<string,string>={
+ all:'সব নোট',
+ general:'সাধারণ নোট',
+ idea:'💡 আইডিয়া',
+ draft:'📝 কনটেন্ট খসড়া',
+ todo:'✅ কাজের তালিকা',
+ urgent:'🔥 জরুরি',
+ credentials:'🔑 লগইন ও তথ্য',
+ other:'📌 অন্যান্য'
+};
+
+export const noteColors:Record<string,{bg:string;border:string;label:string}>={
+ default:{bg:'#ffffff',border:'#e2e8f0',label:'সাদা'},
+ amber:{bg:'#fffbeb',border:'#fde68a',label:'হলুদ / গোল্ড'},
+ emerald:{bg:'#ecfdf5',border:'#a7f3d0',label:'সবুজ'},
+ sky:{bg:'#f0f9ff',border:'#bae6fd',label:'আকাশি / নীল'},
+ purple:{bg:'#faf5ff',border:'#e9d5ff',label:'বেগুনি'},
+ rose:{bg:'#fff1f2',border:'#fecdd3',label:'গোলাপি'}
+};
+
 export function todayDate(){return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Dhaka',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date())}
 
 export type Filters={

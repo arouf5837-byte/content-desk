@@ -12,4 +12,6 @@ For a fresh project: 01-schema.sql, 05-social-credentials.sql, 06-products-busin
 
 15-add-variant-title-thumbnail.sql adds title and thumbnail_url to content_variants for YouTube and platform video materials. Run in Supabase SQL Editor.
 
+16-add-notes-notepad.sql creates public.notes table for the integrated Notepad feature with RLS policies, pinned ordering, and category tags. Run in Supabase SQL Editor.
+
 Legacy failed repair attempts and demo/business seeds are intentionally not included. Keep automation credentials in Vault, not SQL or source control.
